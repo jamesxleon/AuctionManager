@@ -4,6 +4,7 @@
  */
 package manejadordesubastas;
 
+import java.util.Scanner;
 /**
  *
  * @author jamesleon
@@ -12,10 +13,12 @@ package manejadordesubastas;
 public class Main {
     public static void main(String[] args) {
         
+        
+        Scanner scanner = new Scanner(System.in);
         // Crear productos
         Product vanGogh = new Product("La Noche Estrellada", 70000000);
-        Product ferrari = new Product("Ferrari Clásico", 1000000);
-        Product newtonManuscript = new Product("Principios matemáticos de la filosofía natural", 40000000);
+        Product ferrari = new Product("Ferrari Clasico", 1000000);
+        Product newtonManuscript = new Product("Principios matematicos de la filosofia natural", 40000000);
 
         
         // Crear clientes
@@ -102,5 +105,62 @@ public class Main {
             }
         }
         
-    }
+        
+        String clientName;
+        boolean isValidName = false;
+        do {
+            System.out.print("Enter your name: ");
+            clientName = scanner.nextLine();
+            if (!clientName.matches("^[a-zA-Z ]*$")) {
+                System.out.println("Error: your name can only contain letters and spaces. Please try again.");
+            } else {
+                isValidName = true;
+            }
+        } while (!isValidName);
+
+        System.out.println("List of Auctions:");
+        for (int i = 0; i < auctionManager.getAuctions().size(); i++) {
+            System.out.println(i + ". " + auctionManager.getAuctions().get(i).getProduct().getName());
+            }
+            
+           int auctionIndex;
+            do {
+                System.out.println("Enter the index of the auction that you want to join:");
+                // Leer la entrada del usuario como una cadena y convertirla a un entero
+                auctionIndex = Integer.parseInt(scanner.nextLine());
+
+                // Verificar si el índice es válido
+                if (auctionIndex < 0 || auctionIndex >= auctionManager.getAuctions().size()) {
+                    System.out.println("Invalid index. Please enter a valid index.");
+                }
+            } while (auctionIndex < 0 || auctionIndex >= auctionManager.getAuctions().size());
+
+            // Obtener la subasta correspondiente al índice ingresado por el usuario
+            Auction auction = auctionManager.getAuctions().get(auctionIndex); 
+            
+        System.out.print("Enter your bid amount: ");
+        double bidAmount = scanner.nextDouble();
+
+        Auction selectedAuction = auctionManager.getAuctions().get(auctionIndex);
+        Bid highestBid = selectedAuction.getHighestBid();
+
+        if (highestBid != null && bidAmount <= highestBid.getAmount()) {
+                while (bidAmount <= highestBid.getAmount()) {
+                    System.out.printf("Your bid amount must be higher than the current highest bid for this auction ($%.2f). Please enter a new bid amount: ", highestBid.getAmount());
+                    bidAmount = scanner.nextDouble();
+                }
+        } else 
+            {
+            System.out.println("INGRESO VALIDO");
+            Client newClient = new Client(clientName);
+            newClient.subscribe(selectedAuction.getProduct());
+            selectedAuction.placeBid(new Bid(newClient, bidAmount));
+            currentSession.addClient(newClient);
+            System.out.println("Your bid has been placed and you have been added to the session.");
+        }
+        
+        System.out.println("Selected Auction:");
+        System.out.println(selectedAuction.getProduct().getName() + " - Current highest bid: $" +  " - New bid amount: $" + bidAmount);
+
+    }  
 }

@@ -6,6 +6,7 @@ package manejadordesubastas;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  *
@@ -17,6 +18,8 @@ public class Auction {
     private List<Client> clients;
     private boolean isActive;
     private List<Bid> bids;
+    private Calendar startdate;
+    private int auctionDurationWindow;
 
     public Auction(Product product) {
         this.product = product;
@@ -24,9 +27,9 @@ public class Auction {
         this.isActive = false;
         this.bids = new ArrayList<>();
     }
-    
+
     public void placeBid(Bid bid) {
-        if (isActive && bid.getAmount() > product.getCurrentPrice()) {
+        if (isActive() && bid.getAmount() > product.getCurrentPrice()) {
             product.setCurrentPrice(bid.getAmount());
             bids.add(bid);
             notifyClients();
@@ -77,15 +80,49 @@ public class Auction {
     }
 
     public boolean isActive() {
-        return isActive;
+        Calendar now = Calendar.getInstance();
+        Calendar finishdate = Calendar.getInstance();
+        finishdate.add(Calendar.SECOND, this.auctionDurationWindow);
+        return (isActive && now.compareTo(startdate) > 0 && finishdate.compareTo(now) > 0);
     }
 
     public Product getProduct() {
         return product;
     }
-    
+
     public List<Client> getClients() {
         return clients;
     }
-    
+
+    public void setStartDate(Calendar startdate) throws Exception {
+        Calendar now = Calendar.getInstance();
+        if (now.compareTo(startdate) > 0) {
+            throw new Exception("Start date must be after than current date");
+        }
+
+        this.startdate = startdate;
+    }
+
+    public Calendar getStartDate() {
+        return startdate;
+    }
+
+    public void setDurationWindow(int timeInSeconds) throws Exception {
+        if (timeInSeconds < 0) {
+            throw new Exception("Duration window must be greater than zero");
+        }
+        this.auctionDurationWindow = timeInSeconds;
+    }
+
+    public int getDurationWindows() {
+        return this.auctionDurationWindow;
+    }
+
+    @Override
+    public String toString() {
+        Double precio = (this.getHighestBid() != null) ? this.getHighestBid().getAmount() : 0f;
+        return String.format("Producto: %1s\n\rPrecio: $%2.2f\n\rFecha inicio:  %3s",
+                this.product.getName(), precio, this.startdate.getTime());
+    }
+
 }

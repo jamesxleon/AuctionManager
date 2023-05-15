@@ -6,6 +6,7 @@ package manejadordesubastas;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  *
@@ -19,8 +20,10 @@ public class AuctionManager {
         this.auctions = new ArrayList<>();
     }
 
-    public void createAuction(Product product) {
-        auctions.add(new Auction(product));
+    public void createAuction(Product product, Calendar startDate) throws Exception {
+        Auction auction = new Auction(product);
+        auction.setStartDate(startDate);
+        auctions.add(auction);
     }
 
     public void startAuction(Auction auction) {
@@ -30,7 +33,7 @@ public class AuctionManager {
     public void closeAuction(Auction auction) {
         auction.endAuction();
     }
-    
+
     public List<Auction> getAuctions() {
         return auctions;
     }

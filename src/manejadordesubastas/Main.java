@@ -11,8 +11,8 @@ import java.util.Calendar;
  *
  * @author jamesleon
  */
-
 public class Main {
+
     private static AuctionManager auctionManager;
     private static SessionManager sessionManager;
 
@@ -62,7 +62,7 @@ public class Main {
         currentSession.addClient(client3);
 
         // Suscribir al cliente a los productos
-        client.subscribe(vanGogh);
+        /* client.subscribe(vanGogh);
         client1.subscribe(vanGogh);
         client2.subscribe(vanGogh);
         client3.subscribe(vanGogh);
@@ -73,9 +73,8 @@ public class Main {
         client.subscribe(newtonManuscript);
         client1.subscribe(newtonManuscript);
         client2.subscribe(newtonManuscript);
-        client3.subscribe(newtonManuscript);
+        client3.subscribe(newtonManuscript);*/
         // Este proceso es demasiado manual, revisar cómo automatizar
-
         // Comenzar las subastas y la sesión
         for (Auction auction : auctionManager.getAuctions()) {
             // System.out.println(auction);
@@ -120,8 +119,8 @@ public class Main {
 
             if (highestBid != null) {
                 System.out.println(
-                        "The highest bid for " + auction.getProduct().getName() + " is " + highestBid.getAmount() +
-                                " by " + auction.getHighestBid().getBidder().getName());
+                        "The highest bid for " + auction.getProduct().getName() + " is " + highestBid.getAmount()
+                        + " by " + auction.getHighestBid().getBidder().getName());
             }
         }
 
@@ -136,54 +135,103 @@ public class Main {
                 isValidName = true;
             }
         } while (!isValidName);
+        boolean continue_;
 
-        int auctionIndex;
+        
+        
+        
         do {
-            System.out.println("List of Auctions:");
-            for (int i = 0; i < auctionManager.getAuctions().size(); i++) {
-                Auction a = auctionManager.getAuctions().get(i);
-                Calendar now = Calendar.getInstance();
-                if (now.compareTo(a.getFinishDate()) < 0)
-                    System.out.println(i + ". " + a.getProduct().getName());
+            int auctionIndex;
+            do {
+               
+                System.out.println("List of Auctions:");
+                for (int i = 0; i < auctionManager.getAuctions().size(); i++) {
+                    Auction a = auctionManager.getAuctions().get(i);
+                    Calendar now = Calendar.getInstance();
+                    if (now.compareTo(a.getFinishDate()) < 0) {
+                        System.out.println(i + ". " + a.getProduct().getName());
+                    }
+                }
+                System.out.println("Enter the index of the auction that you want to join:");
+                // Leer la entrada del usuario como una cadena y convertirla a un entero
+                auctionIndex = scanner.nextInt();
+
+                switch (auctionIndex) {
+                    case 0:
+                        client.subscribe(vanGogh);
+                        break;
+                    case 1:
+                        client.subscribe(ferrari);
+                        break;
+                    case 2:
+                        client.subscribe(newtonManuscript);
+                        break;
+                    default:
+                        break;
+                }
+
+                // Verificar si el índice es válido
+                if (auctionIndex < 0 || auctionIndex >= auctionManager.getAuctions().size()) {
+                    System.out.println("Invalid index. Please enter a valid index.");
+                }
+            } while (auctionIndex < 0 || auctionIndex >= auctionManager.getAuctions().size());
+
+            // Obtener la subasta correspondiente al índice ingresado por el usuario
+            // Auction auction = auctionManager.getAuctions().get(auctionIndex);
+            System.out.print("Enter your bid amount: ");
+            double bidAmount = scanner.nextDouble();
+
+            Auction selectedAuction = auctionManager.getAuctions().get(auctionIndex);
+            Bid highestBid = selectedAuction.getHighestBid();
+
+            if (highestBid != null && bidAmount <= highestBid.getAmount()) {
+                while (bidAmount <= highestBid.getAmount()) {
+                    System.out.printf(
+                            "Your bid amount must be higher than the current highest bid for this auction ($%.2f). Please enter a new bid amount: ",
+                            highestBid.getAmount());
+                    bidAmount = scanner.nextDouble();
+                }
+            } else {
+                System.out.println("INGRESO VALIDO");
+                Client newClient = new Client(clientName);
+                newClient.subscribe(selectedAuction.getProduct());
+                selectedAuction.placeBid(new Bid(newClient, bidAmount));
+                currentSession.addClient(newClient);
+                System.out.println("Your bid has been placed and you have been added to the session.");
             }
-            System.out.println("Enter the index of the auction that you want to join:");
-            // Leer la entrada del usuario como una cadena y convertirla a un entero
-            auctionIndex = Integer.parseInt(scanner.nextLine());
 
-            // Verificar si el índice es válido
-            if (auctionIndex < 0 || auctionIndex >= auctionManager.getAuctions().size()) {
-                System.out.println("Invalid index. Please enter a valid index.");
+            System.out.println("Selected Auction:");
+            System.out.println(selectedAuction.getProduct().getName() + " - Current highest bid: $" + " - New bid amount: $"
+                    + bidAmount);
+            
+            System.out.println("");
+            Scanner scanerInput = new Scanner(System.in);
+            System.out.println("-Continuar Subasta s/n:");
+            String continueAuction = scanerInput.nextLine();
+            if("s".equals(continueAuction)){
+                continue_ = true; 
+            }else{
+                continue_ = false;
             }
-        } while (auctionIndex < 0 || auctionIndex >= auctionManager.getAuctions().size());
+           
+        } while (continue_);
 
-        // Obtener la subasta correspondiente al índice ingresado por el usuario
-        // Auction auction = auctionManager.getAuctions().get(auctionIndex);
-
-        System.out.print("Enter your bid amount: ");
-        double bidAmount = scanner.nextDouble();
-
-        Auction selectedAuction = auctionManager.getAuctions().get(auctionIndex);
-        Bid highestBid = selectedAuction.getHighestBid();
-
-        if (highestBid != null && bidAmount <= highestBid.getAmount()) {
-            while (bidAmount <= highestBid.getAmount()) {
-                System.out.printf(
-                        "Your bid amount must be higher than the current highest bid for this auction ($%.2f). Please enter a new bid amount: ",
-                        highestBid.getAmount());
-                bidAmount = scanner.nextDouble();
+        System.out.println("");
+        //scanner.close();
+        System.out.println("Deseas cancelar suscripcion s/n");
+        String unsus = scanner.next();
+        if ("s".equals(unsus)) {
+            System.out.println("-Suscripciones");
+            for (int i = 0; i < client.getSubscribedProducts().size(); i++) {
+                System.out.println("Productos " + i + ": " + client.getSubscribedProducts().get(i).getName());
             }
+            System.out.println("Indice para desuscribirse");
+            int indexUnsuscribe = scanner.nextInt();
+            client.unsubscribe(client.getSubscribedProducts().get(indexUnsuscribe));
+
         } else {
-            System.out.println("INGRESO VALIDO");
-            Client newClient = new Client(clientName);
-            newClient.subscribe(selectedAuction.getProduct());
-            selectedAuction.placeBid(new Bid(newClient, bidAmount));
-            currentSession.addClient(newClient);
-            System.out.println("Your bid has been placed and you have been added to the session.");
+            System.out.println("Auction End");
         }
-
-        System.out.println("Selected Auction:");
-        System.out.println(selectedAuction.getProduct().getName() + " - Current highest bid: $" + " - New bid amount: $"
-                + bidAmount);
         scanner.close();
     }
 

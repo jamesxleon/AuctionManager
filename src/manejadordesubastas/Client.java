@@ -50,6 +50,7 @@ public class Client {
 
     public void unsubscribe(Product product) {
         subscribedProducts.remove(product);
+        saveRegistre("Desregistrado de " + product.getName());
     }
 
     public List<Product> getSubscribedProducts() {

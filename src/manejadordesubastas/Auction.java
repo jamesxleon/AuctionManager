@@ -32,6 +32,8 @@ public class Auction {
         if (isActive() && bid.getAmount() > product.getCurrentPrice()) {
             product.setCurrentPrice(bid.getAmount());
             bids.add(bid);
+            bid.getBidder().saveRegistre(
+                    String.format("Place Bid $%1.2f to product %2s", bid.getAmount(), this.getProduct().getName()));
             notifyClients();
         }
     }

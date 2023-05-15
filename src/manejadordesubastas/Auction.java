@@ -19,7 +19,7 @@ public class Auction {
     private boolean isActive;
     private List<Bid> bids;
     private Calendar startdate;
-    private int auctionDurationWindow = 5 * 50;
+    private int auctionDurationWindow = 1 * 60; // Las subastas funcionan por 5 minutos por cuestion de demostración
 
     public Auction(Product product) {
         this.product = product;
@@ -64,6 +64,7 @@ public class Auction {
     public void addClient(Client client) {
         clients.add(client);
         client.subscribe(product);
+        client.saveRegistre("Suscrito a subasta ");
     }
 
     public void removeClient(Client client) {

@@ -19,7 +19,7 @@ public class Auction {
     private boolean isActive;
     private List<Bid> bids;
     private Calendar startdate;
-    private int auctionDurationWindow;
+    private int auctionDurationWindow = 5 * 50;
 
     public Auction(Product product) {
         this.product = product;
@@ -116,6 +116,12 @@ public class Auction {
 
     public int getDurationWindows() {
         return this.auctionDurationWindow;
+    }
+
+    public Calendar getFinishDate() {
+        Calendar retorno = (Calendar) startdate.clone();
+        retorno.add(Calendar.SECOND, this.auctionDurationWindow);
+        return retorno;
     }
 
     @Override

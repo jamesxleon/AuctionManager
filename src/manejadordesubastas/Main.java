@@ -13,9 +13,13 @@ import java.util.Calendar;
  */
 
 public class Main {
+    private static AuctionManager auctionManager;
+    private static SessionManager sessionManager;
+
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
+        // setUpAutions();
         // Crear productos
         Product vanGogh = new Product("La Noche Estrellada", 70000000);
         Product ferrari = new Product("Ferrari Clasico", 1000000);
@@ -28,8 +32,8 @@ public class Main {
         Client client3 = new Client("John Cuatrou");
 
         // Crear manejador de subastas y sesiones
-        AuctionManager auctionManager = new AuctionManager();
-        SessionManager sessionManager = new SessionManager();
+        auctionManager = AuctionManager.getInstance();
+        sessionManager = new SessionManager();
 
         // Fecha actual mas unos seguundos
         Calendar date1 = (Calendar) Calendar.getInstance().clone();
@@ -74,7 +78,7 @@ public class Main {
 
         // Comenzar las subastas y la sesión
         for (Auction auction : auctionManager.getAuctions()) {
-            System.out.println(auction);
+            // System.out.println(auction);
             auction.startAuction();
         }
         sessionManager.startSession(currentSession);
@@ -133,13 +137,15 @@ public class Main {
             }
         } while (!isValidName);
 
-        System.out.println("List of Auctions:");
-        for (int i = 0; i < auctionManager.getAuctions().size(); i++) {
-            System.out.println(i + ". " + auctionManager.getAuctions().get(i).getProduct().getName());
-        }
-
         int auctionIndex;
         do {
+            System.out.println("List of Auctions:");
+            for (int i = 0; i < auctionManager.getAuctions().size(); i++) {
+                Auction a = auctionManager.getAuctions().get(i);
+                Calendar now = Calendar.getInstance();
+                if (now.compareTo(a.getFinishDate()) < 0)
+                    System.out.println(i + ". " + a.getProduct().getName());
+            }
             System.out.println("Enter the index of the auction that you want to join:");
             // Leer la entrada del usuario como una cadena y convertirla a un entero
             auctionIndex = Integer.parseInt(scanner.nextLine());
@@ -179,5 +185,9 @@ public class Main {
         System.out.println(selectedAuction.getProduct().getName() + " - Current highest bid: $" + " - New bid amount: $"
                 + bidAmount);
         scanner.close();
+    }
+
+    private static void setUpAutions() {
+
     }
 }

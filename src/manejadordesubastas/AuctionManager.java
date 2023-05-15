@@ -15,8 +15,16 @@ import java.util.Calendar;
 
 public class AuctionManager {
     private List<Auction> auctions;
+    private static AuctionManager instance = null;
 
-    public AuctionManager() {
+    public static AuctionManager getInstance() {
+        if (instance == null) {
+            instance = new AuctionManager();
+        }
+        return instance;
+    }
+
+    private AuctionManager() {
         this.auctions = new ArrayList<>();
     }
 
